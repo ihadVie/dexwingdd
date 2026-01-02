@@ -1,105 +1,159 @@
-const { spawn } = require("child_process");
-const { readFileSync } = require("fs-extra");
-const http = require("http");
+const assets = require('@miraipr0ject/assets');
+const crypto = require('crypto');
+const os = require("os");
 const axios = require("axios");
-const semver = require("semver");
-const logger = require("./utils/log");
-const express = require('express');
-const path = require('path');
-const chalk = require('chalkercli');
-const chalk1 = require('chalk');
-const CFonts = require('cfonts');
-const app = express();
-const port = process.env.PORT || 2006;
-const moment = require("moment-timezone");
-var gio = moment.tz("Asia/Ho_Chi_Minh").format("HH:mm:ss || D/MM/YYYY");
-var thu = moment.tz('Asia/Ho_Chi_Minh').format('dddd');
-if (thu == 'Sunday') thu = '𝐂𝐡𝐮̉ 𝐍𝐡𝐚̣̂𝐭'
-if (thu == 'Monday') thu = '𝐓𝐡𝐮̛́ 𝐇𝐚𝐢'
-if (thu == 'Tuesday') thu = '𝐓𝐡𝐮̛́ 𝐁𝐚'
-if (thu == 'Wednesday') thu = '𝐓𝐡𝐮̛́ 𝐓𝐮̛'
-if (thu == "Thursday") thu = '𝐓𝐡𝐮̛́ 𝐍𝐚̆𝐦'
-if (thu == 'Friday') thu = '𝐓𝐡𝐮̛́ 𝐒𝐚́𝐮'
-if (thu == 'Saturday') thu = '𝐓𝐡𝐮̛́ 𝐁𝐚̉𝐲'
+const config = require('../config.json');
+const package = require('../package.json');
 
-
-
-
-console.log('ㅤㅤㅤㅤ            𝐇𝐨̂𝐦 𝐧𝐚𝐲 𝐥𝐚̀:' +  thu,'𝐂𝐡𝐮́𝐜 𝐛𝐚̣𝐧 𝐜𝐨́ 𝐦𝐨̣̂𝐭 𝐧𝐠𝐚̀𝐲 𝐯𝐮𝐢 𝐯𝐞̉\n' )
-
-
-
-app.get('/', function(req, res) {
-
-    res.sendFile(path.join(__dirname, '/index.html'));
-
-});
-
-
-app.listen(port);
-console.log('𝐌𝐚́𝐲 𝐜𝐡𝐮̉ 𝐛𝐚̆́𝐭 𝐝𝐚̂̀𝐮 𝐭𝐚̣𝐢 http://localhost:' + port,"𝐯𝐚̀𝐨 𝐥𝐮́𝐜:" + gio,"\n\n");
-
-
-logger("𝐋𝐢𝐞̂𝐧 𝐡𝐞̣̂ 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤: https://www.facebook.com/TatsuYTB", "𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤");
-
-
-const rainbow = chalk.rainbow(`\nㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ『=== Vanloi  ===』\n\n`).stop();
-rainbow.render();
-const frame = rainbow.frame(); 
-console.log(frame);
-logger("𝕐𝕠𝕦𝕣 𝕧𝕖𝕣𝕤𝕚𝕠𝕟 𝕚𝕤 𝕥𝕙𝕖 𝕝𝕒𝕥𝕖𝕤𝕥!", "UPDATE");
-
-
-function startBot(message) {
-    (message) ? logger(message, "BOT ĐANG KHỞI ĐỘNG") : "";
-
-    const child = spawn("node", ["--trace-warnings", "--async-stack-traces", "main.js"], {
-        cwd: __dirname,
-        stdio: "inherit",
-        shell: true
-    });
-
-   child.on("close",async (codeExit) => {
-      var x = 'codeExit'.replace('codeExit',codeExit);
-        if (codeExit == 1) return startBot("BOT RESTARTING!!!");
-         else if (x.indexOf(2) == 0) {
-           await new Promise(resolve => setTimeout(resolve, parseInt(x.replace(2,'')) * 1000));
-                 startBot("Bot has been activated please wait a moment!!!");
-       }
-         else return; 
-    });
-
-    child.on("error", function (error) {
-        logger("An error occurred: " + JSON.stringify(error), "[ Starting ]");
-    });
+module.exports.getYoutube = async function(t, e, i) {
+    require("ytdl-core");
+    const o = require("axios");
+    if ("search" == e) {
+      const e = require("youtube-search-api");
+      return t ? a = (await e.GetListByKeyword(t, !1, 6)).items : console.log("Thiếu dữ liệu")
+    }
+    if ("getLink" == e) {
+      var a = (await o.post("https://aiovideodl.ml/wp-json/aio-dl/video-data/", {
+        url: "https://www.youtube.com/watch?v=" + t
+      })).data;
+        return "video" == i ? {
+          title: a.title,
+          duration: a.duration,
+          download: {
+            SD: a.medias[1].url,
+            HD: a.medias[2].url
+          }
+        } : "audio" == i ? {
+          title: a.title,
+          duration: a.duration,
+          download: a.medias[3].url
+        } : void 0
+      }
 };
-axios.get("https://raw.githubusercontent.com/tandung1/Bot12/main/package.json").then((res) => {
-    //logger(res['data']['name'], "[ TÊN PR0JECT ]");
-    //logger("Version: " + res['data']['version'], "[ PHIÊN BẢN ]");
-    //logger(res['data']['description'], "[ LƯU Ý ]");
-})
-setTimeout(async function () {
-//CFonts.say('Maris v3', {
-    //font: 'block',
-      //align: 'center',
-  //gradient: ['red', 'magenta']
-    //})
-//CFonts.say(`Bot Messenger Created By Vtuan`, {
-    //font: 'console',
-    //align: 'center',
-    //gradient: ['red', 'magenta']
-    //})
-  //CFonts.say('Vtuan\n', {
-    //font: 'block',
-      //align: 'center',
-  //gradient: ['red', 'magenta']
-    //})
 
-rainbow.render(); 
+module.exports.throwError = function (command, threadID, messageID) {
+  const threadSetting = global.data.threadData.get(parseInt(threadID)) || {};
+  return global.client.api.sendMessage(global.getText("utils", "throwError", ((threadSetting.hasOwnProperty("PREFIX")) ? threadSetting.PREFIX : global.config.PREFIX), command), threadID, messageID);
+}
 
-const frame = rainbow.frame(); 
-console.log(frame);
+module.exports.cleanAnilistHTML = function (text) {
+  text = text
+    .replace('<br>', '\n')
+    .replace(/<\/?(i|em)>/g, '*')
+    .replace(/<\/?b>/g, '**')
+    .replace(/~!|!~/g, '||')
+    .replace("&amp;", "&")
+    .replace("&lt;", "<")
+    .replace("&gt;", ">")
+    .replace("&quot;", '"')
+    .replace("&#039;", "'");
+  return text;
+}
 
-  logger('𝐁𝐚̆́𝐭 𝐝𝐚̂̀𝐮 𝐥𝐨𝐚𝐝 𝐬𝐨𝐮𝐫𝐜𝐞 𝐜𝐨𝐝𝐞', 'LOAD')
-  startBot()
-}, 70)
+module.exports.downloadFile = async function (url, path) {
+  const { createWriteStream } = require('fs');
+  const axios = require('axios');
+
+  const response = await axios({
+    method: 'GET',
+    responseType: 'stream',
+    url
+  });
+
+  const writer = createWriteStream(path);
+
+  response.data.pipe(writer);
+
+  return new Promise((resolve, reject) => {
+    writer.on('finish', resolve);
+    writer.on('error', reject);
+  });
+};
+
+module.exports.getContent = async function(url) {
+  try {
+    const axios = require("axios");
+
+    const response = await axios({
+      method: 'GET',
+      url
+    });
+
+    const data = response;
+
+    return data;
+  } catch (e) { return console.log(e); };
+}
+
+module.exports.randomString = function (length) {
+  var result           = '';
+  var characters       = 'ABCDKCCzwKyY9rmBJGu48FrkNMro4AWtCkc1flmnopqrstuvwxyz';
+  var charactersLength = characters.length || 5;
+  for ( var i = 0; i < length; i++ ) result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  return result;
+}
+
+module.exports.assets = {
+  async font (name) {
+    if (!assets.font.loaded) await assets.font.load();
+    return assets.font.get(name);
+  },
+  async image (name) {
+    if (!assets.image.loaded) await assets.image.load();
+    return assets.image.get(name);
+  },
+  async data (name) {
+    if (!assets.data.loaded) await assets.data.load();
+    return assets.data.get(name);
+  }
+}
+
+module.exports.AES = {
+  encrypt (cryptKey, crpytIv, plainData) {
+    var encipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(cryptKey), Buffer.from(crpytIv));
+        var encrypted = encipher.update(plainData);
+    encrypted = Buffer.concat([encrypted, encipher.final()]);
+    return encrypted.toString('hex');
+  },
+  decrypt (cryptKey, cryptIv, encrypted) {
+    encrypted = Buffer.from(encrypted, "hex");
+    var decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(cryptKey), Buffer.from(cryptIv, 'binary'));
+    var decrypted = decipher.update(encrypted);
+
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+
+    return String(decrypted);
+  },
+  makeIv () { return Buffer.from(crypto.randomBytes(16)).toString('hex').slice(0, 16); }
+}
+
+module.exports.homeDir = function () {
+  var returnHome, typeSystem;
+  const home = process.env["HOME"];
+  const user = process.env["LOGNAME"] || process.env["USER"] || process.env["LNAME"] || process.env["USERNAME"];
+
+  switch (process.platform) {
+    case "win32": {
+      returnHome = process.env.USERPROFILE || process.env.HOMEDRIVE + process.env.HOMEPATH || home || null;
+      typeSystem = "win32"
+      break;
+    }
+    case "darwin": {
+      returnHome = home || (user ? '/Users/' + user : null);
+      typeSystem = "darwin";
+      break;
+    }
+    case "linux": {
+      returnHome =  home || (process.getuid() === 0 ? '/root' : (user ? '/home/' + user : null));
+      typeSystem = "linux"
+      break;
+    }
+    default: {
+      returnHome = home || null;
+      typeSystem = "unknow"
+      break;
+    }
+  }
+
+  return [typeof os.homedir === 'function' ? os.homedir() : returnHome, typeSystem];
+}
